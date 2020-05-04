@@ -15,4 +15,4 @@
 # vendor/
 
 # Text files
-.txt
+*.txt
