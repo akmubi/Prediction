@@ -16,3 +16,8 @@
 
 # Text files
 *.txt
+
+math/jacobi.go
+
+# Plot charts
+*.png
