@@ -170,7 +170,7 @@ func (mat Matrix) Write() {
 func (vec Vector) Write() {
 	fmt.Println("[")
 	for _, v := range vec.Array {
-		fmt.Println("\t", v)
+		fmt.Printf("\t%.4f\n", v)
 	}
 	fmt.Println("]")
 }

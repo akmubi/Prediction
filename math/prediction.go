@@ -1,5 +1,7 @@
 package math
 
+import "math"
+
 // Вычисление величины дисперсии ошибки предсказания
 // predicted - вектор предсказанных величин
 // n - порядок полинома
@@ -28,10 +30,10 @@ func (vec Vector) CalculateFirstPrediction(alpha float64) (S Vector, error_dispe
 	vec.Array = vec.Array[:cap(vec.Array)]
 
 	// Вычислим остальные значения
-	for i, value := range vec.Array[5:] {
-		S.Array[i + 5] = alpha * value + beta * S.Array[i + 4]
+	for i, value := range vec.Array[1:] {
+		S.Array[i + 1] = alpha * value + beta * S.Array[i]
 	}
-	error_dispersion = vec.getErrorPredictionDispersion(S, 0)
+	error_dispersion = math.Sqrt(vec.getErrorPredictionDispersion(S, 0))
 	return
 }
 
@@ -57,10 +59,11 @@ func (vec Vector) LinearModel(alpha, a0, a1 float64, m int) (S []Vector, error_d
 	for i := range S {
 		S[i].New(N)
 	}
-	beta := 1 - alpha
+	beta := 1.0 - alpha
+
 	// Определение начальных оценок
 	S[0].Array[0] = a0 - (beta / alpha) * a1
-	S[1].Array[0] = a0 - 2.0 * (beta / alpha) * a1
+	S[1].Array[0] = a0 - (2.0 * beta / alpha) * a1
 
 	next_a0 := make([]float64, N - m)
 	next_a1 := make([]float64, N - m)
@@ -73,7 +76,8 @@ func (vec Vector) LinearModel(alpha, a0, a1 float64, m int) (S []Vector, error_d
 	for i := 1; i < N - m; i++ {
 		S[0].Array[i] = alpha * vec.Array[i] + beta * S[0].Array[i - 1]
 		S[1].Array[i] = alpha * S[0].Array[i] + beta * S[1].Array[i - 1]
-		xt.Array[i], vxt = next_a0[i - 1] + next_a1[i - 1], next_a0[i - 1]
+		xt.Array[i] = next_a0[i - 1] + next_a1[i - 1]
+		vxt = xt.Array[i]
 		next_a0[i] = vec.Array[i] + beta * beta * (vxt - vec.Array[i])
 		next_a1[i] = next_a1[i - 1] + alpha * alpha * (vxt - vec.Array[i])
 	}
@@ -82,6 +86,6 @@ func (vec Vector) LinearModel(alpha, a0, a1 float64, m int) (S []Vector, error_d
 	for i := N - m; i < N; i++ {
 		xt.Array[i] = next_a0[i - m] + float64(m) * next_a1[i - m]
 	}
-	error_dispersion = vec.getErrorPredictionDispersion(xt, 1.0)
+	error_dispersion = math.Sqrt(vec.getErrorPredictionDispersion(xt, 1.0))
 	return
 }

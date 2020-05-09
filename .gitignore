@@ -21,3 +21,6 @@ math/jacobi.go
 
 # Plot charts
 *.png
+*.jpeg
+*.jpg
+*.pdf
